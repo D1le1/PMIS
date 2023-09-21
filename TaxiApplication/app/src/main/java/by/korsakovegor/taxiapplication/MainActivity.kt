@@ -3,13 +3,16 @@ package by.korsakovegor.taxiapplication
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.FragmentActivity
 import by.korsakovegor.taxiapplication.databinding.ActivityMainBinding
+import com.google.android.gms.location.CurrentLocationRequest
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -43,11 +46,11 @@ class MainActivity : OnMapReadyCallback, FragmentActivity() {
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             ActivityCompat.requestPermissions(
-                this, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), 101
+                this, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION), 101
             )
             return
         }
-        var task = fusedClient.lastLocation
+                var task = fusedClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY*1, null);
         task.addOnSuccessListener {
             if (it != null) {
                 currentLocation = it
