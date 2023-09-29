@@ -16,13 +16,46 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
+    <ImageButton
         android:id="@+id/relocate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/button_border"
+        android:padding="8dp"
+        android:src="@drawable/my_location"
         android:text="Relocate"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageButton
+        android:id="@+id/relocate2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/button_border"
+        android:padding="8dp"
+        android:src="@drawable/arrive_location"
+        android:text="Relocate"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/relocate"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <Button
+        android:id="@+id/confirm_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/search_border"
+        android:padding="8dp"
+        android:text="Search Taxi"
+        android:textColor="@color/black"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 
     <androidx.appcompat.widget.SearchView
@@ -36,5 +69,7 @@
         android:theme="@style/SearchViewStyle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:queryHint="Search location" />
+        app:queryHint="Search location" >
+    </androidx.appcompat.widget.SearchView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

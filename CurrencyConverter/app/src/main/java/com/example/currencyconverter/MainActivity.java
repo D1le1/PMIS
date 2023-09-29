@@ -11,14 +11,16 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class MainActivity extends AppCompatActivity {
 
     private Map<String, Double> currencyRates = new HashMap<>();
-    private int firstPreviousPosition;
-    private int secondPreviousPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,29 +32,34 @@ public class MainActivity extends AppCompatActivity {
         Spinner firstCurrencySpinner = findViewById(R.id.first_currency);
         Spinner secondCurrencySpinner = findViewById(R.id.second_currency);
 
-        String[] currencies = {"USD", "RUB", "BYN"};
+        List<String> curr = Arrays.asList("USD", "RUB", "BYN");
+        ArrayList<String> firstCurrencies = new ArrayList<>(curr);
+        ArrayList<String> secondCurrencies = new ArrayList<>(curr);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, currencies);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        firstCurrencySpinner.setAdapter(adapter);
-        secondCurrencySpinner.setAdapter(adapter);
-        secondCurrencySpinner.setSelection(1);
+
+        ArrayAdapter<String> firstAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, firstCurrencies);
+        ArrayAdapter<String> secondAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, secondCurrencies);
+
+        firstAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        secondAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        firstCurrencySpinner.setAdapter(firstAdapter);
+        secondCurrencySpinner.setAdapter(secondAdapter);
 
         TextView result = findViewById(R.id.result);
 
         EditText enterValue = findViewById(R.id.editText);
 
-        firstPreviousPosition = firstCurrencySpinner.getSelectedItemPosition();
-        secondPreviousPosition = secondCurrencySpinner.getSelectedItemPosition();
-
         firstCurrencySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (firstCurrencySpinner.getSelectedItem().equals(secondCurrencySpinner.getSelectedItem())) {
-                    secondCurrencySpinner.setSelection(firstPreviousPosition);
-                    secondPreviousPosition = firstPreviousPosition;
+                secondCurrencies.clear();
+                secondAdapter.addAll(curr);
+                String selectedItem = firstCurrencySpinner.getSelectedItem().toString();
+                if(secondCurrencies.contains(selectedItem))
+                {
+                    secondCurrencies.remove(selectedItem);
+                    secondAdapter.notifyDataSetChanged();
                 }
-                firstPreviousPosition = firstCurrencySpinner.getSelectedItemPosition();
             }
 
             @Override
@@ -63,11 +70,14 @@ public class MainActivity extends AppCompatActivity {
         secondCurrencySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (firstCurrencySpinner.getSelectedItem().equals(secondCurrencySpinner.getSelectedItem())) {
-                    firstCurrencySpinner.setSelection(secondPreviousPosition);
-                    firstPreviousPosition = secondPreviousPosition;
+                firstCurrencies.clear();
+                firstCurrencies.addAll(curr);
+                String selectedItem = secondCurrencySpinner.getSelectedItem().toString();
+                if(firstCurrencies.contains(selectedItem))
+                {
+                    firstCurrencies.remove(selectedItem);
+                    firstAdapter.notifyDataSetChanged();
                 }
-                secondPreviousPosition = secondCurrencySpinner.getSelectedItemPosition();
             }
 
             @Override
