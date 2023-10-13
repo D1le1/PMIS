@@ -1,11 +1,9 @@
-package by.korsakovegor.taxiapplication
+package by.korsakovegor.marketapplication
 
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.FragmentActivity
-import by.korsakovegor.taxiapplication.databinding.ActivityTaxiBinding
+import by.korsakovegor.marketapplication.databinding.ActivityTaxiBinding
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -17,7 +15,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.math.roundToInt
 
 class TaxiActivity : OnMapReadyCallback, FragmentActivity() {
 
@@ -42,7 +39,7 @@ class TaxiActivity : OnMapReadyCallback, FragmentActivity() {
         var mapFragment =
             supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-        activityScope.launch {
+        activityScope.launch{
             delay(5000)
             changeVisibility()
             getTaxiLocation()
@@ -54,21 +51,6 @@ class TaxiActivity : OnMapReadyCallback, FragmentActivity() {
 
         binding.relocate.setOnClickListener {
             getTaxiLocation()
-        }
-
-        binding.confirmButton.setOnClickListener {
-            val distance = intent.getDoubleExtra("distance", 0.0)
-            val cost = (distance * 100).roundToInt() / 100.0
-
-            Log.d("D1le", "Cost: $cost")
-            Log.d("D1le", "Origin: ${intent.getStringExtra("origin")}")
-            Log.d("D1le", "Destination: ${intent.getStringExtra("destination")}")
-
-            val newIntent = Intent(this, CostActivity::class.java)
-            newIntent.putExtra("cost", cost)
-            newIntent.putExtra("origin", intent.getStringExtra("origin"))
-            newIntent.putExtra("destination", intent.getStringExtra("destination"))
-            startActivityForResult(newIntent, 100)
         }
     }
 
@@ -98,12 +80,5 @@ class TaxiActivity : OnMapReadyCallback, FragmentActivity() {
                 12f
             )
         )
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if(requestCode == 100)
-            onBackPressed()
     }
 }
