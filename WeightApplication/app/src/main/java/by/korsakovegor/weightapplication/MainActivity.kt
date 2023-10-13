@@ -7,11 +7,19 @@ import android.content.Context
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.AttributeSet
+import android.view.View
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import by.korsakovegor.weightapplication.databinding.ActivityMainBinding
+import by.korsakovegor.weightapplication.databinding.MenuLayoutBinding
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -23,45 +31,61 @@ import java.lang.Exception
 import java.lang.StringBuilder
 import java.util.UUID
 
-private lateinit var binding: ActivityMainBinding
+private lateinit var binding: MenuLayoutBinding
 private const val ADDRESS = "00:21:13:00:47:2E"
 
 private lateinit var bluetoothSocket: BluetoothSocket
+private lateinit var drawerLayout: DrawerLayout
 
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityMainBinding.inflate(layoutInflater)
+        binding = MenuLayoutBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val mainScope = MainScope()
+        drawerLayout = binding.drawerLayout
 
-        mainScope.launch { connectToBluetoothDevice() }
 
-        binding.button.setOnClickListener {
-            val buffer = ByteArray(1024)
-            val stringBuilder = StringBuilder()
+        binding.reconnectButton.setOnClickListener {
+            binding.connectText.text = "Connecting..."
+            binding.connectIndicator.setImageDrawable(
+                ContextCompat
+                    .getDrawable(this, R.drawable.circle_connecting)
+            )
+            CoroutineScope(Dispatchers.IO).launch {
+                connectToBluetoothDevice()
+            }
 
-            GlobalScope.launch(Dispatchers.IO) {
-                while (isActive) { // Продолжаем читать, пока корутина активна
-                    val bytesRead = bluetoothSocket.inputStream?.read(buffer)
-                    if (bytesRead == null || bytesRead == -1) {
-                        // Если чтение завершено, выходим из цикла
-                        break
-                    }
-
-                    val receivedData = String(buffer, 0, bytesRead, Charsets.UTF_8)
-                    stringBuilder.append(receivedData)
-
-                    // Обновите UI в главном потоке
-                    withContext(Dispatchers.Main) {
-                        binding.textView.text = stringBuilder.toString()
-                    }
-                }
+            binding.userInfo.setOnClickListener{
+                
             }
         }
+
+//        binding.button.setOnClickListener {
+//            val buffer = ByteArray(1024)
+//            val stringBuilder = StringBuilder()
+//
+//            GlobalScope.launch(Dispatchers.IO) {
+//                while (isActive) { // Продолжаем читать, пока корутина активна
+//                    val bytesRead = bluetoothSocket.inputStream?.read(buffer)
+//                    if (bytesRead == null || bytesRead == -1) {
+//                        // Если чтение завершено, выходим из цикла
+//                        break
+//                    }
+//
+//                    val receivedData = String(buffer, 0, bytesRead)
+//                    stringBuilder.append(receivedData)
+//                    delay(5000)
+//
+//                    // Обновите UI в главном потоке
+//                    withContext(Dispatchers.Main) {
+//                        binding.textView.text = stringBuilder.toString()
+//                    }
+//                }
+//            }
+//        }
     }
 
 
@@ -77,23 +101,25 @@ class MainActivity : AppCompatActivity() {
 //                bluetoothAdapter.cancelDiscovery()
                 bluetoothSocket.connect()
 
-                if (bluetoothSocket.isConnected)
-                    binding.textView.text = "Connected"
+                if (bluetoothSocket.isConnected) {
+                    withContext(Dispatchers.Main)
+                    {
+                        binding.connectText.text = "Connected"
+                        binding.connectIndicator.setImageDrawable(
+                            ContextCompat
+                                .getDrawable(applicationContext, R.drawable.circle_active)
+                        )
+                    }
+                }
 
-
-//                val inputStreamReader = InputStreamReader(bluetoothSocket.inputStream, "UTF-8") // Укажите кодировку
-//                val bufferedReader = BufferedReader(inputStreamReader)
-//
-//                val stringBuilder = StringBuilder()
-//                var line: String? = null
-//                while ({ line = bufferedReader.readLine(); line }() != null) {
-//                    stringBuilder.append(line)
-//                }
-//
-//                val receivedData = stringBuilder.toString()
-//
-//                binding.textView.text = receivedData
             } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    binding.connectText.text = "Not Connected"
+                    binding.connectIndicator.setImageDrawable(
+                        ContextCompat
+                            .getDrawable(applicationContext, R.drawable.circle_deactivated)
+                    )
+                }
                 e.printStackTrace()
             }
         }
@@ -123,6 +149,13 @@ class MainActivity : AppCompatActivity() {
             1
         )
 
+    }
+
+    fun toggleDrawer(view: View) {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START))
+            drawerLayout.closeDrawer(GravityCompat.START)
+        else
+            drawerLayout.openDrawer(GravityCompat.START)
     }
 
     override fun onRequestPermissionsResult(

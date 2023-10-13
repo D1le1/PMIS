@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Состояние нажатия -->
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <stroke android:color="#AC174A" android:width="2dp"/>
+            <solid android:color="?attr/colorSecondaryVariant" /> <!-- Измените цвет по вашему желанию -->
+            <corners android:radius="5dp"/>
+        </shape>
+    </item>
+    <!-- Состояние по умолчанию -->
+    <item>
+        <shape android:shape="rectangle">
+            <stroke android:color="?attr/statusBarBackground" android:width="2dp"/>
+            <solid android:color="?attr/colorSecondary" /> <!-- Измените цвет по вашему желанию -->
+            <corners android:radius="5dp"/>
+            <!-- Дополнительные атрибуты, если необходимо -->
+        </shape>
+    </item>
+</selector>
