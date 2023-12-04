@@ -60,10 +60,6 @@ class TaxiActivity : OnMapReadyCallback, FragmentActivity() {
             val distance = intent.getDoubleExtra("distance", 0.0)
             val cost = (distance * 100).roundToInt() / 100.0
 
-            Log.d("D1le", "Cost: $cost")
-            Log.d("D1le", "Origin: ${intent.getStringExtra("origin")}")
-            Log.d("D1le", "Destination: ${intent.getStringExtra("destination")}")
-
             val newIntent = Intent(this, CostActivity::class.java)
             newIntent.putExtra("cost", cost)
             newIntent.putExtra("origin", intent.getStringExtra("origin"))

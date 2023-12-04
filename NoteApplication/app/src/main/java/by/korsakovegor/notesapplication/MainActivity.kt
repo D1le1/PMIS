@@ -1,5 +1,6 @@
 package by.korsakovegor.notesapplication
 
+import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import by.korsakovegor.notesapplication.databinding.ActivityMainBinding
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -23,6 +25,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
+import java.util.ArrayList
 import java.util.Collections
 import java.util.Scanner
 
@@ -30,12 +33,26 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var notes: ArrayList<String>
     private lateinit var adapter: NoteAdapter
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        notes = ArrayList()
 
         addNoteList()
+        binding.addButton.setOnClickListener {
+            val note = ""
+            notes.add(note)
+            adapter.notifyItemInserted(notes.size)
+            val intent = Intent(this, NoteDetailActivity::class.java)
+            intent.putExtra("note", note) // Передайте выбранную заметку в NoteDetailActivity
+            intent.putExtra("pos", notes.size-1)
+
+            val options = ActivityOptions.makeSceneTransitionAnimation(this)
+            startActivityForResult(intent, 100, options.toBundle())
+        }
     }
 
     private fun addNoteList() {
@@ -63,12 +80,15 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-
+                val pos = viewHolder.adapterPosition
+                notes.removeAt(pos)
+                binding.notesRecyclerView.adapter?.notifyItemRemoved(pos)
             }
 
         }
 
-        ItemTouchHelper(itemHelper).apply { attachToRecyclerView(recyclerView) }
+
+        ItemTouchHelper(itemHelper).attachToRecyclerView(recyclerView)
     }
 
     private fun updateNoteList() {

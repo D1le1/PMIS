@@ -1,5 +1,7 @@
 package by.korsakovegor.marketapplication
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -16,13 +18,14 @@ import java.util.Collections
 class CartActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityCartBinding
+    private lateinit var cart: ArrayList<String>
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityCartBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        var cart = intent.getSerializableExtra("cart") as ArrayList<String>
+        cart = intent.getSerializableExtra("cart") as ArrayList<String>
 
         Log.d("D1le", cart.size.toString())
 
@@ -48,7 +51,7 @@ class CartActivity : AppCompatActivity() {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val pos = viewHolder.adapterPosition
                 val book = cart[pos]
-                Snackbar.make(binding.recycler, "Book added to cart", Snackbar.LENGTH_LONG).setAction("UNDO") {
+                Snackbar.make(binding.recycler, "Book removed from cart", Snackbar.LENGTH_LONG).setAction("UNDO") {
                     cart.add(pos, book)
                     (binding.recycler.adapter as RecyclerAdapter).notifyItemInserted(pos)
                 }.show()
@@ -59,5 +62,12 @@ class CartActivity : AppCompatActivity() {
         }
 
         ItemTouchHelper(itemHelper).apply { attachToRecyclerView(binding.recycler) }
+    }
+
+    override fun onBackPressed() {
+        val intent = Intent()
+        intent.putStringArrayListExtra("cart", cart)
+        setResult(Activity.RESULT_OK, intent)
+        super.onBackPressed()
     }
 }

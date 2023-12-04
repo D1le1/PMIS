@@ -1,79 +1,76 @@
 package by.korsakovegor.marketapplication
 
 import android.content.Intent
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.RectF
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.korsakovegor.marketapplication.databinding.ActivityMainBinding
+import by.korsakovegor.marketapplication.RecyclerAdapter
 import com.google.android.material.snackbar.Snackbar
 import java.util.Collections
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private var cart = ArrayList<String>()
+    private lateinit var books: ArrayList<String>
+    private lateinit var adapter: RecyclerAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val cart = ArrayList<String>()
 
-        val books: ArrayList<String> = ArrayList(
+        books = ArrayList(
             listOf(
-                "123",
-                "222",
-                "333",
-                "444",
-                "555",
-                "666",
-                "777",
-                "888"
+                "To Kill a Mockingbird",
+                "1984",
+                "The Great Gatsby",
+                "Pride and Prejudice",
+                "The Catcher in the Rye",
+                "The Lord of the Rings",
+                "The Chronicles of Narnia",
+                "Brave New World",
+                "The Hobbit",
+                "Moby-Dick",
+                "The Odyssey",
+                "War and Peace",
+                "The Adventures of Huckleberry Finn",
+                "The Scarlet Letter",
+                "Don Quixote"
             )
         )
 
+        adapter = RecyclerAdapter(books)
         binding.recycler.layoutManager = LinearLayoutManager(this)
-        binding.recycler.adapter = RecyclerAdapter(books)
-        binding.cartButton.setOnClickListener{
+        binding.recycler.adapter = adapter
+
+        val itemSwipeCallback = ItemSwipeCallback(adapter, books, cart, binding.recycler)
+        val itemTouchHelper = ItemTouchHelper(itemSwipeCallback)
+        itemTouchHelper.attachToRecyclerView(binding.recycler)
+        binding.cartButton.setOnClickListener {
             val intent = Intent(this, CartActivity::class.java)
             intent.putExtra("cart", cart)
-            startActivity(intent)
+            startActivityForResult(intent, 101)
         }
+    }
 
-        val itemHelper = object : ItemTouchHelper.SimpleCallback(
-            ItemTouchHelper.UP or ItemTouchHelper.DOWN,
-            ItemTouchHelper.START or ItemTouchHelper.END
-        ) {
-            override fun onMove(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
-            ): Boolean {
-                val pos = viewHolder.adapterPosition
-                val targetPos = target.adapterPosition
-                Collections.swap(books, pos, targetPos)
-                (binding.recycler.adapter as RecyclerAdapter).notifyItemMoved(pos, targetPos)
-                return false
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when (requestCode) {
+            101 -> {
+                val newCart = data?.getStringArrayListExtra("cart") as ArrayList<String>
+                cart.clear()
+                cart.addAll(newCart)
             }
-
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val pos = viewHolder.adapterPosition
-                val book = books[pos]
-                Snackbar.make(binding.recycler, "Book added to cart", Snackbar.LENGTH_LONG).setAction("UNDO") {
-                    books.add(pos, book)
-                    cart.removeAt(cart.size - 1)
-                    (binding.recycler.adapter as RecyclerAdapter).notifyItemInserted(pos)
-                }.show()
-                cart.add(books[pos])
-                (binding.recycler.adapter as RecyclerAdapter).notifyItemRemoved(viewHolder.adapterPosition)
-                (binding.recycler.adapter as RecyclerAdapter).notifyItemInserted(viewHolder.adapterPosition)
-                Log.d("D1le", "Size: ${cart.size}")
-            }
-
         }
-
-        ItemTouchHelper(itemHelper).apply { attachToRecyclerView(binding.recycler) }
     }
 }

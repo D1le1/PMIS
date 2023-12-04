@@ -29,20 +29,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <ImageButton
-        android:id="@+id/relocate2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="8dp"
-        android:background="@drawable/button_border"
-        android:padding="8dp"
-        android:src="@drawable/arrive_location"
-        android:text="Relocate"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/relocate"
-        app:layout_constraintEnd_toEndOf="parent" />
-
     <Button
         android:id="@+id/confirm_button"
         android:layout_width="wrap_content"
@@ -66,6 +52,7 @@
         android:layout_marginTop="16dp"
         android:background="@drawable/search_border"
         android:focusable="false"
+        app:iconifiedByDefault="false"
         android:theme="@style/SearchViewStyle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

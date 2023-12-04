@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import java.util.ArrayList
 
 class NoteAdapter(private val notes: ArrayList<String>, private val activity: Activity, private val context: Context) : RecyclerView.Adapter<NoteAdapter.NoteViewHolder>() {
 
